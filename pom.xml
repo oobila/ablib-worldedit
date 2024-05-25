@@ -52,6 +52,11 @@
         </dependency>
         <dependency>
             <groupId>com.github.oobila</groupId>
+            <artifactId>ablib-common</artifactId>
+            <version>1.2.13</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.oobila</groupId>
             <artifactId>ablib-chat</artifactId>
             <version>1.0.3</version>
         </dependency>
