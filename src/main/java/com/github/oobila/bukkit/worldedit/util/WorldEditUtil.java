@@ -27,19 +27,19 @@ public class WorldEditUtil {
 
     public static BlockVector3 toBV3(Vector3 vector3) {
         return BlockVector3.at(
-                vector3.getX(),
-                vector3.getY(),
-                vector3.getZ());
+                vector3.x(),
+                vector3.y(),
+                vector3.z());
     }
 
     public static BoundingBox toBoundingBox(Region region) {
         return new BoundingBox(
-                region.getMinimumPoint().getX(),
-                region.getMinimumPoint().getY(),
-                region.getMinimumPoint().getZ(),
-                region.getMaximumPoint().getX(),
-                region.getMaximumPoint().getY(),
-                region.getMaximumPoint().getZ()
+                region.getMinimumPoint().x(),
+                region.getMinimumPoint().y(),
+                region.getMinimumPoint().z(),
+                region.getMaximumPoint().x(),
+                region.getMaximumPoint().y(),
+                region.getMaximumPoint().z()
         );
     }
 
@@ -79,9 +79,9 @@ public class WorldEditUtil {
         World world = player.getWorld();
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
-        for(int y = min.getY(); y <= max.getY(); y++) {
-            for (int x = min.getX(); x <= max.getX(); x++) {
-                for (int z = min.getZ(); z <= max.getZ(); z++) {
+        for(int y = min.y(); y <= max.y(); y++) {
+            for (int x = min.x(); x <= max.x(); x++) {
+                for (int z = min.z(); z <= max.z(); z++) {
                     Block block = world.getBlockAt(x, y, z);
                     Material material = block.getType();
                     if (!materialSet.contains(material)) {
