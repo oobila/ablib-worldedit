@@ -1,5 +1,6 @@
 package com.github.oobila.bukkit.worldedit;
 
+import com.github.oobila.bukkit.persistence.model.SchematicObject;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
@@ -37,19 +38,19 @@ public class SchematicSaveOperationBuilder {
     public SchematicSaveOperationBuilder(Player player) throws IncompleteRegionException {
         LocalSession localSession = WorldEdit.getInstance().getSessionManager().findByName(player.getName());
         editSession = localSession.createEditSession(new BukkitPlayer(player));
-        editSession.setReorderMode(EditSession.ReorderMode.MULTI_STAGE);
+//        editSession.setReorderMode(EditSession.ReorderMode.MULTI_STAGE);
         region = localSession.getSelection();
     }
 
     public SchematicSaveOperationBuilder(Region region) {
         editSession = WorldEdit.getInstance().newEditSession(region.getWorld());
-        editSession.setReorderMode(EditSession.ReorderMode.MULTI_STAGE);
+//        editSession.setReorderMode(EditSession.ReorderMode.MULTI_STAGE);
         this.region = region;
     }
 
     public SchematicSaveOperationBuilder(Clipboard clipboard) {
         editSession = WorldEdit.getInstance().newEditSession(clipboard.getRegion().getWorld());
-        editSession.setReorderMode(EditSession.ReorderMode.MULTI_STAGE);
+//        editSession.setReorderMode(EditSession.ReorderMode.MULTI_STAGE);
         this.region = clipboard.getRegion();
     }
 
@@ -74,6 +75,18 @@ public class SchematicSaveOperationBuilder {
     }
 
     public void save(OutputStream outputStream) throws IOException, WorldEditException {
+        Clipboard clipboard = buildClipboard();
+        try (ClipboardWriter writer = BuiltInClipboardFormat.SPONGE_V3_SCHEMATIC.getWriter(outputStream)){
+            writer.write(clipboard);
+        }
+    }
+
+    public SchematicObject toSchematicObject() throws WorldEditException {
+        Clipboard clipboard = buildClipboard();
+        return new SchematicObject(clipboard);
+    }
+
+    private Clipboard buildClipboard() throws WorldEditException {
         Clipboard clipboard = new BlockArrayClipboard(region);
         ForwardExtentCopy copy = new ForwardExtentCopy(editSession, region, clipboard, region.getMinimumPoint());
         copy.setCopyingEntities(affectsEntities);
@@ -84,14 +97,12 @@ public class SchematicSaveOperationBuilder {
         }
         if (affectsEntities || removeEntities) {
             for (BlockVector2 bv2 : region.getChunks()) {
-                Chunk chunk = BukkitAdapter.adapt(region.getWorld()).getChunkAt(bv2.getX(), bv2.getZ());
+                Chunk chunk = BukkitAdapter.adapt(region.getWorld()).getChunkAt(bv2.x(), bv2.z());
                 chunk.load();
             }
         }
-        try (ClipboardWriter writer = BuiltInClipboardFormat.SPONGE_SCHEMATIC.getWriter(outputStream)){
-            Operations.complete(copy);
-            writer.write(clipboard);
-        }
+        Operations.complete(copy);
+        return clipboard;
     }
 
 }

@@ -1,5 +1,6 @@
 package com.github.oobila.bukkit.worldedit;
 
+import com.github.oobila.bukkit.persistence.model.SchematicObject;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
@@ -36,11 +37,22 @@ public class SchematicLoadOperationBuilder {
     }
 
     public SchematicLoadOperationBuilder(InputStream inputStream, PaletteReplacer paletteReplacer) throws IOException, WorldEditException {
-        try (ClipboardReader reader = BuiltInClipboardFormat.SPONGE_SCHEMATIC.getReader(inputStream)) {
+        try (ClipboardReader reader = BuiltInClipboardFormat.SPONGE_V3_SCHEMATIC.getReader(inputStream)) {
             clipboard = reader.read();
             if (paletteReplacer != null) {
                 paletteReplacer.update(clipboard);
             }
+        }
+    }
+
+    public SchematicLoadOperationBuilder(SchematicObject object) throws WorldEditException {
+        this(object, null);
+    }
+
+    public SchematicLoadOperationBuilder(SchematicObject object, PaletteReplacer paletteReplacer) throws WorldEditException {
+        clipboard = object.getClipboard();
+        if (paletteReplacer != null) {
+            paletteReplacer.update(clipboard);
         }
     }
 
@@ -70,7 +82,7 @@ public class SchematicLoadOperationBuilder {
     public void paste(Location location) throws WorldEditException {
         BlockVector3 blockVector3 = BukkitAdapter.asBlockVector(location);
         try (EditSession editSession = WorldEdit.getInstance().newEditSession(BukkitAdapter.adapt(location.getWorld()))) {
-            editSession.setReorderMode(EditSession.ReorderMode.MULTI_STAGE);
+//            editSession.setReorderMode(EditSession.ReorderMode.MULTI_STAGE);
             ForwardExtentCopy operation = (ForwardExtentCopy) new ClipboardHolder(clipboard)
                     .createPaste(editSession)
                     .to(blockVector3)
