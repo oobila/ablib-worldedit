@@ -1,6 +1,5 @@
 package com.github.oobila.bukkit.worldedit;
 
-import com.github.oobila.bukkit.persistence.model.SchematicObject;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
@@ -27,6 +26,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 @NoArgsConstructor
+@SuppressWarnings("unused")
 public class SchematicSaveOperationBuilder {
 
     private EditSession editSession;
@@ -81,12 +81,7 @@ public class SchematicSaveOperationBuilder {
         }
     }
 
-    public SchematicObject toSchematicObject() throws WorldEditException {
-        Clipboard clipboard = buildClipboard();
-        return new SchematicObject(clipboard);
-    }
-
-    private Clipboard buildClipboard() throws WorldEditException {
+    public Clipboard buildClipboard() throws WorldEditException {
         Clipboard clipboard = new BlockArrayClipboard(region);
         ForwardExtentCopy copy = new ForwardExtentCopy(editSession, region, clipboard, region.getMinimumPoint());
         copy.setCopyingEntities(affectsEntities);

@@ -1,6 +1,5 @@
 package com.github.oobila.bukkit.worldedit;
 
-import com.github.oobila.bukkit.persistence.model.SchematicObject;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
@@ -21,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+@SuppressWarnings("unused")
 public class SchematicLoadOperationBuilder {
 
     private final Clipboard clipboard;
@@ -45,12 +45,12 @@ public class SchematicLoadOperationBuilder {
         }
     }
 
-    public SchematicLoadOperationBuilder(SchematicObject object) throws WorldEditException {
-        this(object, null);
+    public SchematicLoadOperationBuilder(Clipboard clipboard) throws WorldEditException {
+        this(clipboard, null);
     }
 
-    public SchematicLoadOperationBuilder(SchematicObject object, PaletteReplacer paletteReplacer) throws WorldEditException {
-        clipboard = object.getClipboard();
+    public SchematicLoadOperationBuilder(Clipboard clipboard, PaletteReplacer paletteReplacer) throws WorldEditException {
+        this.clipboard = clipboard;
         if (paletteReplacer != null) {
             paletteReplacer.update(clipboard);
         }
