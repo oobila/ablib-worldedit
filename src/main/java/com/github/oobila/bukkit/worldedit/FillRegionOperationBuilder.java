@@ -1,12 +1,12 @@
 package com.github.oobila.bukkit.worldedit;
 
-import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.function.pattern.RandomPattern;
 import com.sk89q.worldedit.regions.Region;
 import org.bukkit.Material;
+
+import static com.github.oobila.bukkit.worldedit.util.WorldEditUtil.editSessionTransaction;
 
 public class FillRegionOperationBuilder {
 
@@ -25,10 +25,9 @@ public class FillRegionOperationBuilder {
         pattern.add(BukkitAdapter.adapt(material.createBlockData()), weight);
     }
 
-    public void fill() throws MaxChangedBlocksException {
-        try (EditSession editSession = WorldEdit.getInstance().newEditSession(region.getWorld())) {
-            editSession.setReorderMode(EditSession.ReorderMode.MULTI_STAGE);
-            editSession.setBlocks(region, pattern);
-        }
+    public void fill() throws WorldEditException {
+        editSessionTransaction(region.getWorld(), editSession ->
+            editSession.setBlocks(region, pattern)
+        );
     }
 }

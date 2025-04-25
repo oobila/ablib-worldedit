@@ -5,10 +5,13 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.util.SideEffect;
+import com.sk89q.worldedit.util.SideEffectSet;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.bukkit.Material;
@@ -17,9 +20,12 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("unused")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class WorldEditUtil {
 
@@ -70,7 +76,7 @@ public class WorldEditUtil {
         return true;
     }
 
-    public static String getSelectionAsLuaSchematic(Player player) {
+    public static String getSelectionAsLuaSchematic(Player player) throws WorldEditLibException {
         char[] characterList = "0abcdefghijklmno".toCharArray();
         List<Material> materialSet = new ArrayList<>();
         materialSet.add(Material.AIR);
@@ -86,7 +92,7 @@ public class WorldEditUtil {
                     Material material = block.getType();
                     if (!materialSet.contains(material)) {
                         if (materialSet.size() == 15) {
-                            throw new RuntimeException("too many materials in lua schematic operation");
+                            throw new WorldEditLibException("too many materials in lua schematic operation");
                         }
                         materialSet.add(material);
                     }
@@ -98,5 +104,23 @@ public class WorldEditUtil {
         String materials = materialSet.stream().map(Enum::name).collect(Collectors.joining(","));
         String template = "schematic = { height=%s, length=%s, width=%s, data=%s, materials={%s} }";
         return String.format(template, region.getHeight(), region.getLength(), region.getWidth(), data, materials);
+    }
+
+    public static void editSessionTransaction(World world, WorldEditConsumer<EditSession> transaction) throws WorldEditException {
+        editSessionTransaction(BukkitAdapter.adapt(world), transaction);
+    }
+
+    public static void editSessionTransaction(com.sk89q.worldedit.world.World world, WorldEditConsumer<EditSession> transaction) throws WorldEditException {
+        WorldEdit worldEdit = WorldEdit.getInstance();
+        try (EditSession editSession = worldEdit.newEditSession(world)) {
+            editSession.setSideEffectApplier(new SideEffectSet(Map.of(SideEffect.NEIGHBORS, SideEffect.State.OFF)));
+            transaction.accept(editSession);
+        } catch (WorldEditException e) {
+            throw new WorldEditLibException(e);
+        }
+    }
+
+    public interface WorldEditConsumer<T> {
+        void accept(T t) throws WorldEditException;
     }
 }

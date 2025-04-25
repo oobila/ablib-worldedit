@@ -16,6 +16,8 @@ import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.util.SideEffect;
+import com.sk89q.worldedit.util.SideEffectSet;
 import lombok.NoArgsConstructor;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
@@ -24,6 +26,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Map;
 
 @NoArgsConstructor
 @SuppressWarnings("unused")
@@ -38,19 +41,19 @@ public class SchematicSaveOperationBuilder {
     public SchematicSaveOperationBuilder(Player player) throws IncompleteRegionException {
         LocalSession localSession = WorldEdit.getInstance().getSessionManager().findByName(player.getName());
         editSession = localSession.createEditSession(new BukkitPlayer(player));
-//        editSession.setReorderMode(EditSession.ReorderMode.MULTI_STAGE);
+        editSession.setSideEffectApplier(new SideEffectSet(Map.of(SideEffect.NEIGHBORS, SideEffect.State.OFF)));
         region = localSession.getSelection();
     }
 
     public SchematicSaveOperationBuilder(Region region) {
         editSession = WorldEdit.getInstance().newEditSession(region.getWorld());
-//        editSession.setReorderMode(EditSession.ReorderMode.MULTI_STAGE);
+        editSession.setSideEffectApplier(new SideEffectSet(Map.of(SideEffect.NEIGHBORS, SideEffect.State.OFF)));
         this.region = region;
     }
 
     public SchematicSaveOperationBuilder(Clipboard clipboard) {
         editSession = WorldEdit.getInstance().newEditSession(clipboard.getRegion().getWorld());
-//        editSession.setReorderMode(EditSession.ReorderMode.MULTI_STAGE);
+        editSession.setSideEffectApplier(new SideEffectSet(Map.of(SideEffect.NEIGHBORS, SideEffect.State.OFF)));
         this.region = clipboard.getRegion();
     }
 

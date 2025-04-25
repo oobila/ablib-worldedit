@@ -1,6 +1,7 @@
 package com.github.oobila.bukkit.worldedit;
 
 import com.github.oobila.bukkit.worldedit.util.UpdateBlock;
+import com.github.oobila.bukkit.worldedit.util.WorldEditLibException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -19,9 +20,9 @@ public class PaletteReplacer {
 
     private static final Map<Material, Material> replacementMap = new EnumMap<>(Material.class);
 
-    public PaletteReplacer(Material... materials) {
+    public PaletteReplacer(Material... materials) throws WorldEditException {
         if (materials.length % 2 != 0) {
-            throw new RuntimeException("material list needs to be provided in pairs!");
+            throw new WorldEditLibException("material list needs to be provided in pairs!");
         }
         for (int i = 0; i < materials.length; i += 2) {
             replacementMap.put(materials[i], materials[i + 1]);

@@ -1,8 +1,6 @@
 package com.github.oobila.bukkit.worldedit;
 
 import com.github.oobila.bukkit.worldedit.util.WorldEditUtil;
-import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -16,6 +14,8 @@ import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
+
+import static com.github.oobila.bukkit.worldedit.util.WorldEditUtil.editSessionTransaction;
 
 public class TransformRegionOperationBuilder {
 
@@ -57,7 +57,7 @@ public class TransformRegionOperationBuilder {
     }
 
     public void apply() throws WorldEditException {
-        try (EditSession editSession = WorldEdit.getInstance().newEditSession(region.getWorld())) {
+        editSessionTransaction(region.getWorld(), editSession -> {
             //copy
             Clipboard clipboard = new BlockArrayClipboard(region);
             ForwardExtentCopy copy = new ForwardExtentCopy(editSession, region, clipboard, region.getMinimumPoint());
@@ -77,7 +77,7 @@ public class TransformRegionOperationBuilder {
                     .copyEntities(true)
                     .build();
             Operations.complete(operation);
-        }
+        });
     }
 
     private Region transformedRegion(Region region, AffineTransform transform) {

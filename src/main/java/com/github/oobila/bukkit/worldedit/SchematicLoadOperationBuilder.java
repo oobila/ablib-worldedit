@@ -1,7 +1,5 @@
 package com.github.oobila.bukkit.worldedit;
 
-import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -19,6 +17,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
+import static com.github.oobila.bukkit.worldedit.util.WorldEditUtil.editSessionTransaction;
 
 @SuppressWarnings("unused")
 public class SchematicLoadOperationBuilder {
@@ -81,8 +81,7 @@ public class SchematicLoadOperationBuilder {
 
     public void paste(Location location) throws WorldEditException {
         BlockVector3 blockVector3 = BukkitAdapter.asBlockVector(location);
-        try (EditSession editSession = WorldEdit.getInstance().newEditSession(BukkitAdapter.adapt(location.getWorld()))) {
-//            editSession.setReorderMode(EditSession.ReorderMode.MULTI_STAGE);
+        editSessionTransaction(location.getWorld(), editSession -> {
             ForwardExtentCopy operation = (ForwardExtentCopy) new ClipboardHolder(clipboard)
                     .createPaste(editSession)
                     .to(blockVector3)
@@ -95,7 +94,7 @@ public class SchematicLoadOperationBuilder {
                 operation.setTransform(transform);
             }
             Operations.complete(operation);
-        }
+        });
     }
 
 }
